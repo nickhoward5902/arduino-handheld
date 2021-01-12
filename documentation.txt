@@ -1,0 +1,42 @@
+OBJECTS
+=======
+LedControl - physical display(s); see own documentation
+FrameBuffer - frame buffer for parallel use with LedControl object(s)
+PlayerDot - controllable single point
+PlayerSprite - controllable sprite made up of 8 PlayerDot objects
+
+VOID FUNCTIONS
+==============
+//
+setup() - Arduino's setup function
+loop() - Arduino's loop function
+//
+LedControl(DIN pin, CLK pin, CS pin, no. of panels) - LedControl's initialisation function
+//
+FrameBuffer.initBuffer() - initialises frame buffer and sets all logic values to off
+FrameBuffer.fillBuffer() - sets all frame buffer logic values to on
+FrameBuffer.togglePoint(x, y) - toggles a frame buffer pixel
+FrameBuffer.getPoint(x, y) - returns the boolean value of a pixel (on or off)
+FrameBuffer.setPoint(x, y) - similar to FrameBuffer.togglePoint(x, y), but has a definite value and will not be overwritten if the value is already present
+FrameBuffer.setByte(horizontal quarter 0-3 L-R, y, data byte) - sets a horizontal group of 8 pixels to a combination stored as a byte
+FrameBuffer.getByte(horizontal quarter 0-3 L-R, y) - returns the byte value of 8 pixels in a row
+FrameBuffer.getRowSerial(y) - prints a row of a specified y coordinate to the serial monitor (requires an initialised serial connection)
+serialBuffer() - prints entire display logic contents to the serial monitor (requires FrameBuffer object F1)
+//
+displayReset() - wakes MAX7219s from low power mode and clears the display (requires FrameBuffer F1, LedControl D1)
+pixelToggle(x, y, boolean) - turns a pixel on or off (D1, F1)
+fill(boolean) - turns the whole display on or off (D1, F1)
+flowFill(boolean, delay between pixels (ms)) - similar to fill(), but has a flowing effect; can be used as a debug animation (D1, F1)
+displayFrame(2D byte matrix) - displays an array of bits as pixels (D1, F1)
+//
+PlayerDot.setPosition(x, y) - sets/resets the position of a PlayerDot object to provided coordinates
+PlayerDot.dotLeft() - moves object 1 pixel to the left
+PlayerDot.dotRight() - moves object 1 pixel to the right
+PlayerDot.dotUp() - moves object 1 pixel up
+PlayerDot.dotDown() - moves object 1 pixel down
+PlayerSprite.setPosition(x, y) - sets/resets the position of a PlayerSprite object to provided coordinates (given coordinate represents lower left corner of sprite)
+PlayerSprite.spriteLeft() - moves object 1 pixel to the left
+PlayerSprite.spriteRight() - moves object 1 pixel to the right
+PlayerSprite.spriteUp() - moves object 1 pixel up
+PlayerSprite.spriteDown - moves object 1 pixel down
+//
