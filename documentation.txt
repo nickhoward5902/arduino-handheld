@@ -5,8 +5,16 @@ FrameBuffer - frame buffer for parallel use with LedControl object(s)
 PlayerDot - controllable single point
 PlayerSprite - controllable sprite made up of 8 PlayerDot objects
 
-VOID FUNCTIONS
-==============
+VARIABLES + CONSTANTS
+=====================
+
+FUNCTIONS
+=========
+const bool debug - states whether or not the programmer has chosen to run the script in debug mode, enabling features such as serial output
+const byte displaycheck[16][4] - image stored as an array, which displays the number of each display panel on the respective display panel
+const byte border[16][4] - array image; displays a 1 pixel thick border around the edge of the display
+-
+
 //
 setup() - Arduino's setup function
 loop() - Arduino's loop function
@@ -21,22 +29,28 @@ FrameBuffer.setPoint(x, y) - similar to FrameBuffer.togglePoint(x, y), but has a
 FrameBuffer.setByte(horizontal quarter 0-3 L-R, y, data byte) - sets a horizontal group of 8 pixels to a combination stored as a byte
 FrameBuffer.getByte(horizontal quarter 0-3 L-R, y) - returns the byte value of 8 pixels in a row
 FrameBuffer.getRowSerial(y) - prints a row of a specified y coordinate to the serial monitor (requires an initialised serial connection)
-serialBuffer() - prints entire display logic contents to the serial monitor (requires FrameBuffer object F1)
+serialBuffer() - prints entire display logic contents to the serial monitor (requires FrameBuffer object F0)
 //
-displayReset() - wakes MAX7219s from low power mode and clears the display (requires FrameBuffer F1, LedControl D1)
-pixelToggle(x, y, boolean) - turns a pixel on or off (D1, F1)
-fill(boolean) - turns the whole display on or off (D1, F1)
-flowFill(boolean, delay between pixels (ms)) - similar to fill(), but has a flowing effect; can be used as a debug animation (D1, F1)
-displayFrame(2D byte matrix) - displays an array of bits as pixels (D1, F1)
+displayReset() - wakes MAX7219s from low power mode and clears the display (requires FrameBuffer F0, LedControl D0)
+pixelToggle(x, y, boolean) - turns a pixel on or off (D0, F0)
+fill(boolean) - turns the whole display on or off (D0, F0)
+flowFill(boolean, delay between pixels (ms)) - similar to fill(), but has a flowing effect; can be used as a debug animation (D0, F0)
+displayFrame(2D byte matrix) - displays an array of bits as pixels (D0, F0)
 //
 PlayerDot.setPosition(x, y) - sets/resets the position of a PlayerDot object to provided coordinates
 PlayerDot.dotLeft() - moves object 1 pixel to the left
 PlayerDot.dotRight() - moves object 1 pixel to the right
 PlayerDot.dotUp() - moves object 1 pixel up
 PlayerDot.dotDown() - moves object 1 pixel down
+PlayerDot.dotDeathCheck(x, y) - checks if a certain pixel is already occupied, and if colliding with said pixel will cause the two to overlap, "killing" it
+PlayerDot.dotKill() - kills the dot
 PlayerSprite.setPosition(x, y) - sets/resets the position of a PlayerSprite object to provided coordinates (given coordinate represents lower left corner of sprite)
 PlayerSprite.spriteLeft() - moves object 1 pixel to the left
 PlayerSprite.spriteRight() - moves object 1 pixel to the right
 PlayerSprite.spriteUp() - moves object 1 pixel up
-PlayerSprite.spriteDown - moves object 1 pixel down
+PlayerSprite.spriteDown() - moves object 1 pixel down
+PlayerSprite.spriteDeathSentence(x, y) - checks if the sprite being in a certain position will "kill" it, and updates the values associated with it
+PlayerSprite.spriteDeathCheck() - checks all the points of the sprite for dead ones, and sets the sprite as dead if any of the pixels are dead
+PlayerSprite.spriteKill() - kills the sprite
+
 //
