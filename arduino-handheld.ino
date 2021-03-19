@@ -332,7 +332,7 @@ class ComponentDot {
     }
 };
 
-class SpriteCircle {
+class SpriteO {
   public:
     ComponentDot PO1;
     ComponentDot PO2;
@@ -431,36 +431,36 @@ class SpriteCircle {
     }
 };
 
-class SCControl{
+class SOControl{
   public:
-    void moveLeft(SpriteCircle SC) {
-      int x = SC.x - 1;
-      int y = SC.y;
-      SC.spriteLeft();
+    void moveLeft(SpriteO SO) {
+      int x = SO.x - 1;
+      int y = SO.y;
+      SO.spriteLeft();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveRight(SpriteCircle SC) {
-      int x = SC.x + 1;
-      int y = SC.y;
-      SC.spriteRight();
+    void moveRight(SpriteO SO) {
+      int x = SO.x + 1;
+      int y = SO.y;
+      SO.spriteRight();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveUp(SpriteCircle SC) {
-      int x = SC.x;
-      int y = SC.y + 1;
-      SC.spriteUp();
+    void moveUp(SpriteO SO) {
+      int x = SO.x;
+      int y = SO.y + 1;
+      SO.spriteUp();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveDown(SpriteCircle SC) {
-      int x = SC.x;
-      int y = SC.y - 1;
-      SC.spriteDown();
+    void moveDown(SpriteO SO) {
+      int x = SO.x;
+      int y = SO.y - 1;
+      SO.spriteDown();
       if (debug == true) {
         serialBuffer();
       }
@@ -583,9 +583,9 @@ class SXControl{
 */
 
 SpriteX SX0;
-SpriteCircle SC0;
+SpriteO SO0;
 SXControl SXX0;
-SCControl SCX0;
+SOControl SOX0;
 
 void setup() {
   if (debug == true) {
@@ -597,7 +597,7 @@ void setup() {
   displayFrame(displaycheck);
   delay(1000);
   displayReset();
-  SC0.setPosition(6,6);
+  SO0.setPosition(6,6);
   SX0.setPosition(22,6);
 }
 
@@ -608,18 +608,18 @@ void loop() {
   int randC = random(2,7); // double bias for x-axis as it is twice the size of the y-axis
   switch (randC) {
     case 1:
-      SCX0.moveUp(SC0);
+      SOX0.moveUp(SO0);
       break;
     case 2:
     case 3:
-      SCX0.moveLeft(SC0);
+      SOX0.moveLeft(SO0);
       break;
     case 4:
     case 5:
-      SCX0.moveRight(SC0);
+      SOX0.moveRight(SO0);
       break;
     case 6:
-      SCX0.moveDown(SC0);
+      SOX0.moveDown(SO0);
       break;
   }
   int randX = random(2,7);
