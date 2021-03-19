@@ -262,7 +262,7 @@ void displayFrame(byte frame [16][4]) {
       }
 }
 
-class PlayerDot {
+class ComponentDot {
   public:
     int x = -1;
     int y = -1;
@@ -332,120 +332,246 @@ class PlayerDot {
     }
 };
 
-class PlayerSprite {
+class SpriteCircle {
   public:
+    ComponentDot PO1;
+    ComponentDot PO2;
+    ComponentDot PO3;
+    ComponentDot PO4;
+    ComponentDot PO5;
+    ComponentDot PO6;
+    ComponentDot PO7;
+    ComponentDot PO8;
+    ComponentDot PO9;
+    ComponentDot POA;
+    ComponentDot POB;
+    ComponentDot POC;
     int x = 0;
-    int y = 0; //coordinates of bottom left corner of sprite
-    PlayerDot P1;
-    PlayerDot P2;
-    PlayerDot P3;
-    PlayerDot P4;
-    PlayerDot P5;
-    PlayerDot P6;
-    PlayerDot P7;
-    PlayerDot P8;
-    PlayerDot DotArrayH[8] = {P2, P8, P4, P6, P3, P5, P1, P7};
-    PlayerDot DotArrayV[8] = {P7, P8, P5, P6, P3, P4, P1, P2};
+    int y = 0; //coordinates of lower left corner of sprite
     void setPosition(int x1, int y1) {
       x = x1;
       y = y1;
-      P1.setPosition(x, y);
-      P2.setPosition((x + 3), y);
-      P3.setPosition((x + 1), (y + 1));
-      P4.setPosition((x + 2), (y + 1));
-      P5.setPosition((x + 1), (y + 2));
-      P6.setPosition((x + 2), (y + 2));
-      P7.setPosition(x, (y + 3));
-      P8.setPosition((x + 3), (y + 3));
       /**
-         7xx8
-         x56x
-         x34x
-         1xx2
-      */
+      x 1 2 x
+      3 4 5 6
+      7 8 9 A
+      x B C x
+      **/
+      PO1.setPosition((x+1), (y+3));
+      PO2.setPosition((x+2), (y+3));
+      PO3.setPosition(x, (y+2));
+      PO4.setPosition((x+1), (y+2));
+      PO5.setPosition((x+2), (y+2));
+      PO6.setPosition((x+3), (y+2));
+      PO7.setPosition(x, (y+1));
+      PO8.setPosition((x+1), (y+1));
+      PO9.setPosition((x+2), (y+1));
+      POA.setPosition((x+3), (y+1));
+      POB.setPosition((x+1), y);
+      POC.setPosition((x+2), y);
       if (debug == true) {
         serialBuffer();
       }
     }
     void spriteRight() {
-      P2.dotRight();
-      P8.dotRight();
-      P4.dotRight();
-      P6.dotRight();
-      P3.dotRight();
-      P5.dotRight();
-      P1.dotRight();
-      P7.dotRight();
+      PO6.dotRight();
+      POA.dotRight();
+      PO2.dotRight();
+      PO5.dotRight();
+      PO9.dotRight();
+      POC.dotRight();
+      PO1.dotRight();
+      PO4.dotRight();
+      PO8.dotRight();
+      POB.dotRight();
+      PO3.dotRight();
+      PO7.dotRight();
     }
     void spriteLeft() {
-      //non functional iteration
-      /**for (int i = 0; i < 8; i++) {
-        PlayerDot s = DotArrayH[i];
-        s.dotLeft();
-        }*/
-      P7.dotLeft();
-      P1.dotLeft();
-      P5.dotLeft();
-      P3.dotLeft();
-      P6.dotLeft();
-      P4.dotLeft();
-      P8.dotLeft();
-      P2.dotLeft();
+      PO7.dotLeft();
+      PO3.dotLeft();
+      POB.dotLeft();
+      PO8.dotLeft();
+      PO4.dotLeft();
+      PO1.dotLeft();
+      POC.dotLeft();
+      PO9.dotLeft();
+      PO5.dotLeft();
+      PO2.dotLeft();
+      POA.dotLeft();
+      PO6.dotLeft();
     }
     void spriteUp() {
-      P7.dotUp();
-      P8.dotUp();
-      P5.dotUp();
-      P6.dotUp();
-      P3.dotUp();
-      P4.dotUp();
-      P1.dotUp();
-      P2.dotUp();
+      PO1.dotUp();
+      PO2.dotUp();
+      PO3.dotUp();
+      PO4.dotUp();
+      PO5.dotUp();
+      PO6.dotUp();
+      PO7.dotUp();
+      PO8.dotUp();
+      PO9.dotUp();
+      POA.dotUp();
+      POB.dotUp();
+      POC.dotUp();
     }
     void spriteDown() {
-      P2.dotDown();
-      P1.dotDown();
-      P4.dotDown();
-      P3.dotDown();
-      P6.dotDown();
-      P5.dotDown();
-      P8.dotDown();
-      P7.dotDown();
+      POC.dotDown();
+      POB.dotDown();
+      POA.dotDown();
+      PO9.dotDown();
+      PO8.dotDown();
+      PO7.dotDown();
+      PO6.dotDown();
+      PO5.dotDown();
+      PO4.dotDown();
+      PO3.dotDown();
+      PO2.dotDown();
+      PO1.dotDown();
     }
 };
 
-PlayerSprite S0;
-
-class PlayerControl{
+class SCControl{
   public:
-    void moveLeft() {
-      int x = S0.x - 1;
-      int y = S0.y;
-      S0.spriteLeft();
+    void moveLeft(SpriteCircle SC) {
+      int x = SC.x - 1;
+      int y = SC.y;
+      SC.spriteLeft();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveRight() {
-      int x = S0.x + 1;
-      int y = S0.y;
-      S0.spriteRight();
+    void moveRight(SpriteCircle SC) {
+      int x = SC.x + 1;
+      int y = SC.y;
+      SC.spriteRight();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveUp() {
-      int x = S0.x;
-      int y = S0.y + 1;
-      S0.spriteUp();
+    void moveUp(SpriteCircle SC) {
+      int x = SC.x;
+      int y = SC.y + 1;
+      SC.spriteUp();
       if (debug == true) {
         serialBuffer();
       }
     }
-    void moveDown() {
-      int x = S0.x;
-      int y = S0.y - 1;
-      S0.spriteDown();
+    void moveDown(SpriteCircle SC) {
+      int x = SC.x;
+      int y = SC.y - 1;
+      SC.spriteDown();
+      if (debug == true) {
+        serialBuffer();
+      }
+    }
+};
+
+class SpriteX {
+  public:
+    ComponentDot PX1;
+    ComponentDot PX2;
+    ComponentDot PX3;
+    ComponentDot PX4;
+    ComponentDot PX5;
+    ComponentDot PX6;
+    ComponentDot PX7;
+    ComponentDot PX8;
+    int x = 0;
+    int y = 0; //coordinates of lower left corner of sprite
+    void setPosition(int x1, int y1) {
+      x = x1;
+      y = y1;
+      /**
+      1 x x 2
+      x 3 4 x
+      x 5 6 x
+      7 x x 8
+      **/
+      PX1.setPosition(x, (y+3));
+      PX2.setPosition((x+3), (y+3));
+      PX3.setPosition((x+1), (y+2));
+      PX4.setPosition((x+2), (y+2));
+      PX5.setPosition((x+1), (y+1));
+      PX6.setPosition((x+2), (y+1));
+      PX7.setPosition(x, y);
+      PX8.setPosition((x+3), y);
+      if (debug == true) {
+        serialBuffer();
+      }
+    }
+    void spriteRight() {
+      PX2.dotRight();
+      PX8.dotRight();
+      PX4.dotRight();
+      PX6.dotRight();
+      PX3.dotRight();
+      PX5.dotRight();
+      PX1.dotRight();
+      PX7.dotRight();
+    }
+    void spriteLeft() {
+      PX7.dotLeft();
+      PX1.dotLeft();
+      PX5.dotLeft();
+      PX3.dotLeft();
+      PX6.dotLeft();
+      PX4.dotLeft();
+      PX8.dotLeft();
+      PX2.dotLeft();
+    }
+    void spriteUp() {
+      PX1.dotUp();
+      PX2.dotUp();
+      PX3.dotUp();
+      PX4.dotUp();
+      PX5.dotUp();
+      PX6.dotUp();
+      PX7.dotUp();
+      PX8.dotUp();
+    }
+    void spriteDown() {
+      PX8.dotDown();
+      PX7.dotDown();
+      PX6.dotDown();
+      PX5.dotDown();
+      PX4.dotDown();
+      PX3.dotDown();
+      PX2.dotDown();
+      PX1.dotDown();
+    }
+};
+
+class SXControl{
+  public:
+    void moveLeft(SpriteX SX) {
+      int x = SX.x - 1;
+      int y = SX.y;
+      SX.spriteLeft();
+      if (debug == true) {
+        serialBuffer();
+      }
+    }
+    void moveRight(SpriteX SX) {
+      int x = SX.x + 1;
+      int y = SX.y;
+      SX.spriteRight();
+      if (debug == true) {
+        serialBuffer();
+      }
+    }
+    void moveUp(SpriteX SX) {
+      int x = SX.x;
+      int y = SX.y + 1;
+      SX.spriteUp();
+      if (debug == true) {
+        serialBuffer();
+      }
+    }
+    void moveDown(SpriteX SX) {
+      int x = SX.x;
+      int y = SX.y - 1;
+      SX.spriteDown();
       if (debug == true) {
         serialBuffer();
       }
@@ -456,7 +582,10 @@ class PlayerControl{
     Avoid use of LedControl functions over custom functions, or buffer functions over display functions; this will not update the frame buffer and may cause some logic issues
 */
 
-PlayerControl X0;
+SpriteX SX0;
+SpriteCircle SC0;
+SXControl SXX0;
+SCControl SCX0;
 
 void setup() {
   if (debug == true) {
@@ -468,27 +597,47 @@ void setup() {
   displayFrame(displaycheck);
   delay(1000);
   displayReset();
-  S0.setPosition(14,6);
+  SC0.setPosition(6,6);
+  SX0.setPosition(22,6);
 }
 
 void loop() {
   if (debug == true) {
         Serial.println("loop()");
       }
-  int rand = random(1,7);
-  switch (rand) {
+  int randC = random(2,7); // double bias for x-axis as it is twice the size of the y-axis
+  switch (randC) {
     case 1:
-      X0.moveUp();
+      SCX0.moveUp(SC0);
       break;
-    case 2 || 3:
-      X0.moveLeft();
+    case 2:
+    case 3:
+      SCX0.moveLeft(SC0);
       break;
-    case 4 || 5:
-      X0.moveRight();
+    case 4:
+    case 5:
+      SCX0.moveRight(SC0);
       break;
     case 6:
-      X0.moveDown();
+      SCX0.moveDown(SC0);
       break;
   }
-  delay(100);
+  int randX = random(2,7);
+  switch (randX) {
+    case 1:
+      SXX0.moveUp(SX0);
+      break;
+    case 2:
+    case 3:
+      SXX0.moveLeft(SX0);
+      break;
+    case 4:
+    case 5:
+      SXX0.moveRight(SX0);
+      break;
+    case 6:
+      SXX0.moveDown(SX0);
+      break;
+  }
+  delay(500);
 }
