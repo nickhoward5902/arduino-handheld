@@ -1,4 +1,5 @@
 #include <LedControl.h>
+#include <hardwareSerial.h>
 
 // d1 - 16x32
 // display.setLed(display, row, column, on)
@@ -6,7 +7,7 @@
 
 const bool debug = false;
 
-const byte displaycheck [16][4] {
+byte displaycheck [16][4] {
   {B00000000, B00000000, B00000000, B00000000},
   {B01111100, B01111100, B00001000, B00111100},
   {B00000010, B00000010, B00011000, B01000110},
@@ -25,7 +26,7 @@ const byte displaycheck [16][4] {
   {B00000000, B00000000, B00000000, B00000000}
 };
 
-const byte border [16][4] {
+byte border [16][4] {
   {B11111111, B11111111, B11111111, B11111111},
   {B10000000, B00000001, B00000000, B00000001},
   {B10000000, B00000000, B10000000, B00000001},
@@ -163,7 +164,7 @@ class FrameBuffer {
 };
 
 FrameBuffer F0;
-LedControl D0 = LedControl(12, 13, 11, 8); // DIN, CLK, CS, number of MAX72XXs
+LedControl D0 = LedControl(4, 5, 3, 8); // DIN, CLK, CS, number of MAX72XXs
 
 void serialBuffer() {
   Serial.println("==FRAME==");
@@ -760,17 +761,11 @@ void setup() {
   displayReset();
   displayFrame(displaycheck);
   delay(1000);
-  displayReset();
-  SX0.setPosition(0,2);
-  SO0.setPosition(28,2);
-  SQ0.setPosition(14,2);
+  //displayReset();
 }
 
 void loop() {
   if (debug == true) {
         Serial.println("loop()");
       }
-  SXX0.moveLeft();
-  SOX0.moveRight();
-  SQX0.moveUp();
 }
