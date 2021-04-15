@@ -5,7 +5,11 @@
 // display.setLed(display, row, column, on)
 // d, x, y coordinates start from 0, not 1 (0d-7d, 0x-31x, 0y-15y)
 
-const bool debug = false;
+const bool debug = false; //set as true to return serial images through the COM port; completely annihilates performance and slows everything to a crawl
+const unsigned int movementDelay = 5; //delay in ms between movements in control models
+//movement starts producing trails below 10ms, processing limit seems to be around 0.4ms for a single point
+
+//Disclaimer - debug output works fine with the Arduino IDE's serial monitor, but is heavily corrupted and garbled if used with VSCode's serial monitor
 
 byte displaycheck [16][4] {
   {B00000000, B00000000, B00000000, B00000000},
@@ -24,25 +28,6 @@ byte displaycheck [16][4] {
   {B00100000, B00111100, B01111100, B00001000},
   {B00000000, B00000000, B00000000, B00000000},
   {B00000000, B00000000, B00000000, B00000000}
-};
-
-byte border [16][4] {
-  {B11111111, B11111111, B11111111, B11111111},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B10000000, B00000001, B00000000, B00000001},
-  {B10000000, B00000000, B10000000, B00000001},
-  {B11111111, B11111111, B11111111, B11111111}
 };
 
 /**
@@ -333,414 +318,79 @@ class ComponentDot {
     }
 };
 
-class SpriteO {
+class SpriteDot {
   public:
-    ComponentDot PO1;
-    ComponentDot PO2;
-    ComponentDot PO3;
-    ComponentDot PO4;
-    ComponentDot PO5;
-    ComponentDot PO6;
-    ComponentDot PO7;
-    ComponentDot PO8;
-    ComponentDot PO9;
-    ComponentDot POA;
-    ComponentDot POB;
-    ComponentDot POC;
+    ComponentDot P1;
     int x = 0;
     int y = 0; //coordinates of lower left corner of sprite
     void setPosition(int x1, int y1) {
       x = x1;
       y = y1;
       /**
-      x 1 2 x
-      3 4 5 6
-      7 8 9 A
-      x B C x
+      1
       **/
-      PO1.setPosition((x+1), (y+3));
-      PO2.setPosition((x+2), (y+3));
-      PO3.setPosition(x, (y+2));
-      PO4.setPosition((x+1), (y+2));
-      PO5.setPosition((x+2), (y+2));
-      PO6.setPosition((x+3), (y+2));
-      PO7.setPosition(x, (y+1));
-      PO8.setPosition((x+1), (y+1));
-      PO9.setPosition((x+2), (y+1));
-      POA.setPosition((x+3), (y+1));
-      POB.setPosition((x+1), y);
-      POC.setPosition((x+2), y);
+      P1.setPosition(x,y);
       if (debug == true) {
         serialBuffer();
       }
     }
     void spriteRight() {
-      PO6.dotRight();
-      POA.dotRight();
-      PO2.dotRight();
-      PO5.dotRight();
-      PO9.dotRight();
-      POC.dotRight();
-      PO1.dotRight();
-      PO4.dotRight();
-      PO8.dotRight();
-      POB.dotRight();
-      PO3.dotRight();
-      PO7.dotRight();
+      P1.dotRight();
     }
     void spriteLeft() {
-      PO7.dotLeft();
-      PO3.dotLeft();
-      POB.dotLeft();
-      PO8.dotLeft();
-      PO4.dotLeft();
-      PO1.dotLeft();
-      POC.dotLeft();
-      PO9.dotLeft();
-      PO5.dotLeft();
-      PO2.dotLeft();
-      POA.dotLeft();
-      PO6.dotLeft();
+      P1.dotLeft();
     }
     void spriteUp() {
-      PO1.dotUp();
-      PO2.dotUp();
-      PO3.dotUp();
-      PO4.dotUp();
-      PO5.dotUp();
-      PO6.dotUp();
-      PO7.dotUp();
-      PO8.dotUp();
-      PO9.dotUp();
-      POA.dotUp();
-      POB.dotUp();
-      POC.dotUp();
+      P1.dotUp();
     }
     void spriteDown() {
-      POC.dotDown();
-      POB.dotDown();
-      POA.dotDown();
-      PO9.dotDown();
-      PO8.dotDown();
-      PO7.dotDown();
-      PO6.dotDown();
-      PO5.dotDown();
-      PO4.dotDown();
-      PO3.dotDown();
-      PO2.dotDown();
-      PO1.dotDown();
+      P1.dotDown();
     }
 };
 
-SpriteO SO0;
-
-class SOControl{
+class SpriteDotControl{
+  private:
+    SpriteDot CONTROL;
   public:
+    void initialise(SpriteDot SD, int x, int y) {
+      CONTROL = SD;
+      CONTROL.setPosition(x,y);
+    }
     void moveLeft() {
-      int x = SO0.x - 1;
-      int y = SO0.y;
-      SO0.spriteLeft();
+      int x = CONTROL.x - 1;
+      int y =  CONTROL.y;
+      CONTROL.spriteLeft();
       if (debug == true) {
         serialBuffer();
       }
+      delay(movementDelay);
     }
     void moveRight() {
-      int x = SO0.x + 1;
-      int y = SO0.y;
-      SO0.spriteRight();
+      int x = CONTROL.x + 1;
+      int y = CONTROL.y;
+      CONTROL.spriteRight();
       if (debug == true) {
         serialBuffer();
       }
+      delay(movementDelay);
     }
     void moveUp() {
-      int x = SO0.x;
-      int y = SO0.y + 1;
-      SO0.spriteUp();
+      int x = CONTROL.x;
+      int y = CONTROL.y + 1;
+      CONTROL.spriteUp();
       if (debug == true) {
         serialBuffer();
       }
+      delay(movementDelay);
     }
     void moveDown() {
-      int x = SO0.x;
-      int y = SO0.y - 1;
-      SO0.spriteDown();
+      int x = CONTROL.x;
+      int y = CONTROL.y - 1;
+      CONTROL.spriteDown();
       if (debug == true) {
         serialBuffer();
       }
-    }
-};
-
-class SpriteX {
-  public:
-    ComponentDot PX1;
-    ComponentDot PX2;
-    ComponentDot PX3;
-    ComponentDot PX4;
-    ComponentDot PX5;
-    ComponentDot PX6;
-    ComponentDot PX7;
-    ComponentDot PX8;
-    int x = 0;
-    int y = 0; //coordinates of lower left corner of sprite
-    void setPosition(int x1, int y1) {
-      x = x1;
-      y = y1;
-      /**
-      1 x x 2
-      x 3 4 x
-      x 5 6 x
-      7 x x 8
-      **/
-      PX1.setPosition(x, (y+3));
-      PX2.setPosition((x+3), (y+3));
-      PX3.setPosition((x+1), (y+2));
-      PX4.setPosition((x+2), (y+2));
-      PX5.setPosition((x+1), (y+1));
-      PX6.setPosition((x+2), (y+1));
-      PX7.setPosition(x, y);
-      PX8.setPosition((x+3), y);
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void spriteRight() {
-      PX2.dotRight();
-      PX8.dotRight();
-      PX4.dotRight();
-      PX6.dotRight();
-      PX3.dotRight();
-      PX5.dotRight();
-      PX1.dotRight();
-      PX7.dotRight();
-    }
-    void spriteLeft() {
-      PX7.dotLeft();
-      PX1.dotLeft();
-      PX5.dotLeft();
-      PX3.dotLeft();
-      PX6.dotLeft();
-      PX4.dotLeft();
-      PX8.dotLeft();
-      PX2.dotLeft();
-    }
-    void spriteUp() {
-      PX1.dotUp();
-      PX2.dotUp();
-      PX3.dotUp();
-      PX4.dotUp();
-      PX5.dotUp();
-      PX6.dotUp();
-      PX7.dotUp();
-      PX8.dotUp();
-    }
-    void spriteDown() {
-      PX8.dotDown();
-      PX7.dotDown();
-      PX6.dotDown();
-      PX5.dotDown();
-      PX4.dotDown();
-      PX3.dotDown();
-      PX2.dotDown();
-      PX1.dotDown();
-    }
-};
-
-SpriteX SX0;
-
-class SXControl{
-  public:
-    void moveLeft() {
-      int x = SX0.x - 1;
-      int y = SX0.y;
-      SX0.spriteLeft();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveRight() {
-      int x = SX0.x + 1;
-      int y = SX0.y;
-      SX0.spriteRight();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveUp() {
-      int x = SX0.x;
-      int y = SX0.y + 1;
-      SX0.spriteUp();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveDown() {
-      int x = SX0.x;
-      int y = SX0.y - 1;
-      SX0.spriteDown();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-};
-
-class SpriteQ {
-  public:
-    ComponentDot PQ1;
-    ComponentDot PQ2;
-    ComponentDot PQ3;
-    ComponentDot PQ4;
-    ComponentDot PQ5;
-    ComponentDot PQ6;
-    ComponentDot PQ7;
-    ComponentDot PQ8;
-    ComponentDot PQ9;
-    ComponentDot PQA;
-    ComponentDot PQB;
-    ComponentDot PQC;
-    ComponentDot PQD;
-    ComponentDot PQE;
-    ComponentDot PQF;
-    ComponentDot PQG;
-    int x = 0;
-    int y = 0; //coordinates of lower left corner of sprite
-    void setPosition(int x1, int y1) {
-      x = x1;
-      y = y1;
-      /**
-      1 2 3 4
-      5 6 7 8
-      9 A B C
-      D E F G
-      **/
-      PQ1.setPosition(x, (y+3));
-      PQ2.setPosition((x+1), (y+3));
-      PQ3.setPosition((x+2), (y+3));
-      PQ4.setPosition((x+3), (y+3));
-      PQ5.setPosition(x, (y+2));
-      PQ6.setPosition((x+1), (y+2));
-      PQ7.setPosition((x+2), (y+2));
-      PQ8.setPosition((x+3), (y+2));
-      PQ9.setPosition(x, (y+1));
-      PQA.setPosition((x+1), (y+1));
-      PQB.setPosition((x+2), (y+1));
-      PQC.setPosition((x+3), (y+1));
-      PQD.setPosition(x, y);
-      PQE.setPosition((x+1), y);
-      PQF.setPosition((x+2), y);
-      PQG.setPosition((x+3), y);
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void spriteRight() {
-      PQ4.dotRight();
-      PQ8.dotRight();
-      PQC.dotRight();
-      PQG.dotRight();
-      PQ3.dotRight();
-      PQ7.dotRight();
-      PQB.dotRight();
-      PQF.dotRight();
-      PQ2.dotRight();
-      PQ6.dotRight();
-      PQA.dotRight();
-      PQE.dotRight();
-      PQ1.dotRight();
-      PQ5.dotRight();
-      PQ9.dotRight();
-      PQD.dotRight();
-    }
-    void spriteLeft() {
-      PQD.dotLeft();
-      PQ9.dotLeft();
-      PQ5.dotLeft();
-      PQ1.dotLeft();
-      PQE.dotLeft();
-      PQA.dotLeft();
-      PQ6.dotLeft();
-      PQ2.dotLeft();
-      PQF.dotLeft();
-      PQB.dotLeft();
-      PQ7.dotLeft();
-      PQ3.dotLeft();
-      PQG.dotLeft();
-      PQC.dotLeft();
-      PQ8.dotLeft();
-      PQ4.dotLeft();
-    }
-    void spriteUp() {
-      PQ1.dotUp();
-      PQ2.dotUp();
-      PQ3.dotUp();
-      PQ4.dotUp();
-      PQ5.dotUp();
-      PQ6.dotUp();
-      PQ7.dotUp();
-      PQ8.dotUp();
-      PQ9.dotUp();
-      PQA.dotUp();
-      PQB.dotUp();
-      PQC.dotUp();
-      PQD.dotUp();
-      PQE.dotUp();
-      PQF.dotUp();
-      PQG.dotUp();
-    }
-    void spriteDown() {
-      PQG.dotDown();
-      PQF.dotDown();
-      PQE.dotDown();
-      PQD.dotDown();
-      PQC.dotDown();
-      PQB.dotDown();
-      PQA.dotDown();
-      PQ9.dotDown();
-      PQ8.dotDown();
-      PQ7.dotDown();
-      PQ6.dotDown();
-      PQ5.dotDown();
-      PQ4.dotDown();
-      PQ3.dotDown();
-      PQ2.dotDown();
-      PQ1.dotDown();
-    }
-};
-
-SpriteQ SQ0;
-
-class SQControl{
-  public:
-    void moveLeft() {
-      int x = SQ0.x - 1;
-      int y = SQ0.y;
-      SQ0.spriteLeft();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveRight() {
-      int x = SQ0.x + 1;
-      int y = SQ0.y;
-      SQ0.spriteRight();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveUp() {
-      int x = SQ0.x;
-      int y = SQ0.y + 1;
-      SQ0.spriteUp();
-      if (debug == true) {
-        serialBuffer();
-      }
-    }
-    void moveDown() {
-      int x = SQ0.x;
-      int y = SQ0.y - 1;
-      SQ0.spriteDown();
-      if (debug == true) {
-        serialBuffer();
-      }
+      delay(movementDelay);
     }
 };
 
@@ -748,9 +398,14 @@ class SQControl{
     Avoid use of LedControl functions over custom functions, or buffer functions over display functions; this will not update the frame buffer and may cause some logic issues
 */
 
-SXControl SXX0;
-SOControl SOX0;
-SQControl SQX0;
+SpriteDotControl SX0;
+SpriteDot S0;
+SpriteDotControl SX1;
+SpriteDot S1;
+SpriteDotControl SX2;
+SpriteDot S2;
+SpriteDotControl SX3;
+SpriteDot S3;
 
 void setup() {
   if (debug == true) {
@@ -761,11 +416,16 @@ void setup() {
   displayReset();
   displayFrame(displaycheck);
   delay(1000);
-  //displayReset();
+  displayReset();
+  SX0.initialise(S0,7,3);
+  SX1.initialise(S1,7,12);
+  SX2.initialise(S2,24,3);
+  SX3.initialise(S3,24,12);
 }
 
 void loop() {
   if (debug == true) {
-        Serial.println("loop()");
-      }
+      Serial.println("loop()");
+  }
+  
 }
