@@ -6,7 +6,7 @@
 // d, x, y coordinates start from 0, not 1 (0d-7d, 0x-31x, 0y-15y)
 
 const bool debug = false; //set as true to return serial images through the COM port; completely annihilates performance and slows everything to a crawl
-const unsigned int movementDelay = 5; //delay in ms between movements in control models
+const unsigned int movementDelay = 50; //delay in ms between movements in control models
 //movement starts producing trails below 10ms, processing limit seems to be around 0.4ms for a single point
 
 //Disclaimer - debug output works fine with the Arduino IDE's serial monitor, but is heavily corrupted and garbled if used with VSCode's serial monitor
@@ -28,6 +28,25 @@ byte displaycheck [16][4] {
   {B00100000, B00111100, B01111100, B00001000},
   {B00000000, B00000000, B00000000, B00000000},
   {B00000000, B00000000, B00000000, B00000000}
+};
+
+byte walls [16][4] {
+  {B00000001, B00000001, B00000001, B11111111},
+  {B00000001, B00000001, B00000000, B00000001},
+  {B00000001, B00000001, B00000000, B00000001},
+  {B11111111, B00000001, B00000000, B00000001},
+  {B00000001, B00000001, B00000001, B00000001},
+  {B00000000, B00000001, B00000001, B00000001},
+  {B00000000, B00000001, B00000001, B00000001},
+  {B00000000, B00000001, B00000001, B00000001},
+  {B00000001, B00000001, B00000001, B00000000},
+  {B00000001, B00000001, B00000001, B00000000},
+  {B00000001, B00000001, B00000001, B00000000},
+  {B00000001, B00000000, B00000001, B00000001},
+  {B00000001, B00000000, B00000001, B00000001},
+  {B00000001, B00000000, B00000001, B00000001},
+  {B00000001, B00000001, B00000001, B00000001},
+  {B00000001, B00000001, B00000001, B00000001}
 };
 
 /**
@@ -346,6 +365,11 @@ class SpriteDot {
     void spriteDown() {
       P1.dotDown();
     }
+    void spriteKill() {
+      pixelToggle(x, y, false);
+      x=-255;
+      y=-255;
+    }
 };
 
 class SpriteDotControl{
@@ -354,12 +378,24 @@ class SpriteDotControl{
   public:
     void initialise(SpriteDot SD, int x, int y) {
       CONTROL = SD;
-      CONTROL.setPosition(x,y);
+      bool isOccupied = F0.getPoint(x,y);
+      if (isOccupied == true) {
+        CONTROL.spriteKill();
+      }
+      else {
+        CONTROL.setPosition(x,y);
+      }
     }
     void moveLeft() {
       int x = CONTROL.x - 1;
       int y =  CONTROL.y;
-      CONTROL.spriteLeft();
+      bool isOccupied = F0.getPoint(x,y);
+      if (isOccupied == true) {
+        CONTROL.spriteKill();
+      }
+      else {
+        CONTROL.spriteLeft();
+      }
       if (debug == true) {
         serialBuffer();
       }
@@ -368,7 +404,13 @@ class SpriteDotControl{
     void moveRight() {
       int x = CONTROL.x + 1;
       int y = CONTROL.y;
-      CONTROL.spriteRight();
+      bool isOccupied = F0.getPoint(x,y);
+      if (isOccupied == true) {
+        CONTROL.spriteKill();
+      }
+      else {
+        CONTROL.spriteRight();
+      }
       if (debug == true) {
         serialBuffer();
       }
@@ -377,7 +419,13 @@ class SpriteDotControl{
     void moveUp() {
       int x = CONTROL.x;
       int y = CONTROL.y + 1;
-      CONTROL.spriteUp();
+      bool isOccupied = F0.getPoint(x,y);
+      if (isOccupied == true) {
+        CONTROL.spriteKill();
+      }
+      else {
+        CONTROL.spriteUp();
+      }
       if (debug == true) {
         serialBuffer();
       }
@@ -386,7 +434,12 @@ class SpriteDotControl{
     void moveDown() {
       int x = CONTROL.x;
       int y = CONTROL.y - 1;
-      CONTROL.spriteDown();
+      if (F0.getPoint(x,y) == true) {
+        CONTROL.spriteKill();
+      }
+      else {
+        CONTROL.spriteDown();
+      }
       if (debug == true) {
         serialBuffer();
       }
@@ -398,14 +451,8 @@ class SpriteDotControl{
     Avoid use of LedControl functions over custom functions, or buffer functions over display functions; this will not update the frame buffer and may cause some logic issues
 */
 
-SpriteDotControl SX0;
 SpriteDot S0;
-SpriteDotControl SX1;
-SpriteDot S1;
-SpriteDotControl SX2;
-SpriteDot S2;
-SpriteDotControl SX3;
-SpriteDot S3;
+SpriteDotControl SX0;
 
 void setup() {
   if (debug == true) {
@@ -417,15 +464,14 @@ void setup() {
   displayFrame(displaycheck);
   delay(1000);
   displayReset();
-  SX0.initialise(S0,7,3);
-  SX1.initialise(S1,7,12);
-  SX2.initialise(S2,24,3);
-  SX3.initialise(S3,24,12);
+  displayFrame(walls);
+  SX0.initialise(S0,4,6);
 }
 
 void loop() {
   if (debug == true) {
       Serial.println("loop()");
   }
-  
+  SX0.moveDown();
+  SX0.moveRight();
 }
