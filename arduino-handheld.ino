@@ -186,13 +186,15 @@ void displayReset() {
     D0.clearDisplay(i); // sets all leds to off
   }
   if (debug == true) {
-        serialBuffer();
-      }
+    serialBuffer();
+  }
 }
 
 void pixelToggle(int x, int y, bool isOn) { // converts a 32x16y value into 4dx2dy8x8y
   int d;
-  F0.setPoint(x, 15 - y, isOn);
+  if ((x >= 0) and (y >= 0)) {
+    F0.setPoint(x, 15 - y, isOn);
+  }
   if (x > 7) {
     d = 6;
     x -= 8;
@@ -231,8 +233,8 @@ void fill(bool isOn) {
     }
   }
   if (debug == true) {
-        serialBuffer();
-      }
+    serialBuffer();
+  }
 }
 
 void flowFill(bool isOn, int delayTime) {
@@ -243,8 +245,8 @@ void flowFill(bool isOn, int delayTime) {
     }
   }
   if (debug == true) {
-        serialBuffer();
-      }
+    serialBuffer();
+  }
 }
 
 void displayFrame(byte frame [16][4]) {
@@ -263,8 +265,8 @@ void displayFrame(byte frame [16][4]) {
     }
   }
   if (debug == true) {
-        serialBuffer();
-      }
+    serialBuffer();
+  }
 }
 
 class ComponentDot {
@@ -346,9 +348,9 @@ class SpriteDot {
       x = x1;
       y = y1;
       /**
-      1
+        1
       **/
-      P1.setPosition(x,y);
+      P1.setPosition(x, y);
       if (debug == true) {
         serialBuffer();
       }
@@ -365,33 +367,30 @@ class SpriteDot {
     void spriteDown() {
       P1.dotDown();
     }
-    void spriteKill() {
-      pixelToggle(x, y, false);
-      x=-255;
-      y=-255;
-    }
 };
 
-class SpriteDotControl{
+class SpriteDotControl {
   private:
     SpriteDot CONTROL;
   public:
     void initialise(SpriteDot SD, int x, int y) {
       CONTROL = SD;
-      bool isOccupied = F0.getPoint(x,y);
+      bool isOccupied = F0.getPoint(x, y);
       if (isOccupied == true) {
-        CONTROL.spriteKill();
+        // Do nothing
+        Serial.println("Wall detected [initialisation]");
       }
       else {
-        CONTROL.setPosition(x,y);
+        CONTROL.setPosition(x, y);
       }
     }
     void moveLeft() {
       int x = CONTROL.x - 1;
       int y =  CONTROL.y;
-      bool isOccupied = F0.getPoint(x,y);
+      bool isOccupied = F0.getPoint(x, y);
       if (isOccupied == true) {
-        CONTROL.spriteKill();
+        // Do nothing
+        Serial.println("Wall detected [left]");
       }
       else {
         CONTROL.spriteLeft();
@@ -404,9 +403,10 @@ class SpriteDotControl{
     void moveRight() {
       int x = CONTROL.x + 1;
       int y = CONTROL.y;
-      bool isOccupied = F0.getPoint(x,y);
+      bool isOccupied = F0.getPoint(x, y);
       if (isOccupied == true) {
-        CONTROL.spriteKill();
+        // Do nothing
+        Serial.println("Wall detected [right]");
       }
       else {
         CONTROL.spriteRight();
@@ -419,9 +419,10 @@ class SpriteDotControl{
     void moveUp() {
       int x = CONTROL.x;
       int y = CONTROL.y + 1;
-      bool isOccupied = F0.getPoint(x,y);
+      bool isOccupied = F0.getPoint(x, y);
       if (isOccupied == true) {
-        CONTROL.spriteKill();
+        // Do nothing
+        Serial.println("Wall detected [above]");
       }
       else {
         CONTROL.spriteUp();
@@ -434,8 +435,9 @@ class SpriteDotControl{
     void moveDown() {
       int x = CONTROL.x;
       int y = CONTROL.y - 1;
-      if (F0.getPoint(x,y) == true) {
-        CONTROL.spriteKill();
+      if (F0.getPoint(x, y) == true) {
+        // Do nothing
+        Serial.println("Wall detected [below]");
       }
       else {
         CONTROL.spriteDown();
@@ -455,8 +457,8 @@ SpriteDot S0;
 SpriteDotControl SX0;
 
 void setup() {
+  Serial.begin(115200); // serial channel for debugging (high baud rate to avoid significant slowdown)
   if (debug == true) {
-    Serial.begin(115200); // serial channel for debugging (high baud rate to avoid significant slowdown)
     Serial.println("setup()");
   }
   F0.initBuffer();
@@ -465,12 +467,12 @@ void setup() {
   delay(1000);
   displayReset();
   displayFrame(walls);
-  SX0.initialise(S0,4,6);
+  SX0.initialise(S0, 4, 6);
 }
 
 void loop() {
   if (debug == true) {
-      Serial.println("loop()");
+    Serial.println("loop()");
   }
   SX0.moveDown();
   SX0.moveRight();
