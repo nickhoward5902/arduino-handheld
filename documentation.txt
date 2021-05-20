@@ -2,20 +2,23 @@ OBJECTS
 =======
 LedControl - physical display(s); see own documentation
 FrameBuffer - frame buffer for parallel use with LedControl object(s)
-PlayerDot - controllable single point
-PlayerSprite - controllable sprite made up of 8 PlayerDot objects
+ComponentDot - controllable single point
+SpriteDot - controllable sprite made up of 8 ComponentDot objects
+SpriteDotControl - similar to SpriteDot, but uses (as of now non-functional) collision detection.
 
 VARIABLES + CONSTANTS
 =====================
 
-FUNCTIONS
-=========
 const bool debug - states whether or not the programmer has chosen to run the script in debug mode, enabling features such as serial output
 const byte displaycheck[16][4] - image stored as an array, which displays the number of each display panel on the respective display panel
 const byte border[16][4] - array image; displays a 1 pixel thick border around the edge of the display
 -
 
 //
+
+FUNCTIONS
+=========
+
 setup() - Arduino's setup function
 loop() - Arduino's loop function
 //
@@ -37,20 +40,15 @@ fill(boolean) - turns the whole display on or off (D0, F0)
 flowFill(boolean, delay between pixels (ms)) - similar to fill(), but has a flowing effect; can be used as a debug animation (D0, F0)
 displayFrame(2D byte matrix) - displays an array of bits as pixels (D0, F0)
 //
-PlayerDot.setPosition(x, y) - sets/resets the position of a PlayerDot object to provided coordinates
-PlayerDot.dotLeft() - moves object 1 pixel to the left
-PlayerDot.dotRight() - moves object 1 pixel to the right
-PlayerDot.dotUp() - moves object 1 pixel up
-PlayerDot.dotDown() - moves object 1 pixel down
-PlayerDot.dotDeathCheck(x, y) - checks if a certain pixel is already occupied, and if colliding with said pixel will cause the two to overlap, "killing" it
-PlayerDot.dotKill() - kills the dot
-PlayerSprite.setPosition(x, y) - sets/resets the position of a PlayerSprite object to provided coordinates (given coordinate represents lower left corner of sprite)
-PlayerSprite.spriteLeft() - moves object 1 pixel to the left
-PlayerSprite.spriteRight() - moves object 1 pixel to the right
-PlayerSprite.spriteUp() - moves object 1 pixel up
-PlayerSprite.spriteDown() - moves object 1 pixel down
-PlayerSprite.spriteDeathSentence(x, y) - checks if the sprite being in a certain position will "kill" it, and updates the values associated with it
-PlayerSprite.spriteDeathCheck() - checks all the points of the sprite for dead ones, and sets the sprite as dead if any of the pixels are dead
-PlayerSprite.spriteKill() - kills the sprite
-
+ComponentDot.setPosition(x, y) - sets/resets the position of a ComponentDot object to provided coordinates
+ComponentDot.dotLeft() - moves object 1 pixel to the left
+ComponentDot.dotRight() - moves object 1 pixel to the right
+ComponentDot.dotUp() - moves object 1 pixel up
+ComponentDot.dotDown() - moves object 1 pixel down
+SpriteDot.setPosition(x, y) - sets/resets the position of a SpriteDot object to provided coordinates (given coordinate represents lower left corner of sprite)
+SpriteDot.spriteLeft() - moves object 1 pixel to the left
+SpriteDot.spriteRight() - moves object 1 pixel to the right
+SpriteDot.spriteUp() - moves object 1 pixel up
+SpriteDot.spriteDown() - moves object 1 pixel down
+SpriteDotControl variants of the same functions - 
 //
