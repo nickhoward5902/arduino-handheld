@@ -30,23 +30,23 @@ byte displaycheck [16][4] {
   {B00000000, B00000000, B00000000, B00000000}
 };
 
-byte walls [16][4] {
-  {B00000001, B00000001, B00000001, B11111111},
-  {B00000001, B00000001, B00000000, B00000001},
-  {B00000001, B00000001, B00000000, B00000001},
-  {B11111111, B00000001, B00000000, B00000001},
-  {B00000001, B00000001, B00000001, B00000001},
-  {B00000000, B00000001, B00000001, B00000001},
-  {B00000000, B00000001, B00000001, B00000001},
-  {B00000000, B00000001, B00000001, B00000001},
-  {B00000001, B00000001, B00000001, B00000000},
-  {B00000001, B00000001, B00000001, B00000000},
-  {B00000001, B00000001, B00000001, B00000000},
-  {B00000001, B00000000, B00000001, B00000001},
-  {B00000001, B00000000, B00000001, B00000001},
-  {B00000001, B00000000, B00000001, B00000001},
-  {B00000001, B00000001, B00000001, B00000001},
-  {B00000001, B00000001, B00000001, B00000001}
+byte border [16][4] {
+  {B11111111, B11111111, B11111111, B11111111},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B10000000, B00000000, B00000000, B00000001},
+  {B11111111, B11111111, B11111111, B11111111}
 };
 
 /**
@@ -453,6 +453,7 @@ class SpriteDotControl {
     Avoid use of LedControl functions over custom functions, or buffer functions over display functions; this will not update the frame buffer and may cause some logic issues
 */
 
+// definition of controllable sprite S0 and control class SX0
 SpriteDot S0;
 SpriteDotControl SX0;
 
@@ -461,19 +462,41 @@ void setup() {
   if (debug == true) {
     Serial.println("setup()");
   }
-  F0.initBuffer();
-  displayReset();
-  displayFrame(displaycheck);
+  // INSERT SETUP CODE HERE
+  F0.initBuffer(); // initialises the frame buffer
+  displayReset(); // resets/wakes the MAX7219 chips and the connected displays
+  displayFrame(displaycheck); // displays the 32107654 test screen to ensure that all 8 LED matrices are working correctly
   delay(1000);
   displayReset();
-  displayFrame(walls);
-  SX0.initialise(S0, 4, 6);
+  displayFrame(border); // displays a 1-pixel border around the edges of the display. The displayFrame function can be used with any 16x4 byte array, consisting of 512 bits or 64 bytes, one byte for each row, one bit for each pixel
+  SX0.initialise(S0, 2, 2); // initialises SX0 as a controller for sprite S0 at coordinates (2,2)
 }
 
 void loop() {
   if (debug == true) {
     Serial.println("loop()");
   }
-  SX0.moveDown();
-  SX0.moveRight();
+  // INSERT LOOP CODE HERE
+  // demonstration of basic xy movement (sprite goes 16 right, 16 left, 8 up, 8 down, returning to its original position)
+  for (int i = 0; i < 16; i++) {
+    SX0.moveRight;
+  }
+  for (int i = 0; i < 16; i++) {
+    SX0.moveLeft;
+  }
+  for (int i = 0; i < 8; i++) {
+    SX0.moveUp;
+  }
+  for (int i = 0; i < 8; i++) {
+    SX0.moveDown;
+  }
+  /**
+  demonstration of further image display functions
+  **/
+  displayReset(); // completely clears the display, including the sprite, which will disappear until called upon again, which will cause it to reappear at the position given
+  flowFill(true,10); // flow fills the display with a delay of 10ms between pixels
+  fill(false); // clears the display without completely resetting the chips
+  pixelToggle(0, 0, true);
+  bool dotState = F0.getPoint(0,0);
+  Serial.println(dotState); // sets the (0,0) pixel on, and checks if the corresponding change has taken place within the frame buffer; if it has been carries out successfully, this statement should output "true" or "1" to the serial monitor through the COM port
 }
